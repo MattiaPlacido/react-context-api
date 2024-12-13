@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 //contexts
-import PostsProvider from "./contexts/PostsContext";
+import { PostsProvider } from "./contexts/PostsContext";
 // PAGINE
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
@@ -11,7 +11,7 @@ import NewPostPage from "./pages/NewPostPage";
 //index
 import SinglePost from "./pages/SinglePost";
 //show
-import PostsPage from "./pages/PostsPage/PostsPage";
+import PostsPage from "./pages/PostsPage";
 // LAYOUT
 import DefaultLayout from "./layouts/DefaultLayout";
 import AlternativeLayout from "./layouts/AlternativeLayout";

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import styles from "./postPage.module.css";
+import styles from "./postList.module.css";
 import { Link } from "react-router-dom";
 
 const initialPostData = {
@@ -11,7 +11,7 @@ const initialPostData = {
   id: -1,
 };
 
-export default function PostsPage() {
+export default function PostsList() {
   const [postData, setPostData] = useState([initialPostData]);
 
   const getData = () => {
