@@ -1,59 +1,52 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const PostsContext = createContext();
 
+const initialPostData = {
+  title: "Default title",
+  content: "Default content",
+  image: "https://via.placeholder.com/600/771796",
+  category: "Sport",
+  published: true,
+  id: -1,
+};
+
 export const PostsProvider = ({ children }) => {
-  //lista dei post momentanea per verificare funzioni, da  sostituire con la chiamata all'api
-  const posts = [
-    {
-      id: 1,
-      title: "Lorem",
-      content:
-        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sit animi perspiciatis consequuntur vero at necessitatibus nostrum blanditiis, natus eum? Numquam nulla asperiores cumque, repudiandae odit alias aliquam nihil earum commodi.",
-      image: "",
-      published: true,
-      category: "music",
-    },
-    {
-      id: 2,
-      title: "Ipsum",
-      content:
-        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sit animi perspiciatis consequuntur vero at necessitatibus nostrum blanditiis, natus eum? Numquam nulla asperiores cumque, repudiandae odit alias aliquam nihil earum commodi.",
-      image: "",
-      published: true,
-      category: "sport",
-    },
-    {
-      id: 3,
-      title: "Lorem ipsum",
-      content:
-        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sit animi perspiciatis consequuntur vero at necessitatibus nostrum blanditiis, natus eum? Numquam nulla asperiores cumque, repudiandae odit alias aliquam nihil earum commodi.",
-      image: "",
-      published: false,
-      category: "news",
-    },
-    {
-      id: 4,
-      title: "Title",
-      content:
-        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sit animi perspiciatis consequuntur vero at necessitatibus nostrum blanditiis, natus eum? Numquam nulla asperiores cumque, repudiandae odit alias aliquam nihil earum commodi.",
-      image: "",
-      published: false,
-      category: "gaming",
-    },
-    {
-      id: 5,
-      title: "Default title",
-      content:
-        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sit animi perspiciatis consequuntur vero at necessitatibus nostrum blanditiis, natus eum? Numquam nulla asperiores cumque, repudiandae odit alias aliquam nihil earum commodi.",
-      image: "",
-      published: true,
-      category: "politics",
-    },
-  ];
+  const [posts, setPosts] = useState([initialPostData]);
+
+  const getPosts = () => {
+    fetch("http://localhost:3000")
+      .then((res) => res.json())
+      .then((data) => {
+        setPosts(data.posts);
+      })
+      .catch((error) => console.error("Errore nella richiesta SHOW :", error));
+  };
+
+  useEffect(getPosts, []);
+
+  const deleteData = (id) => {
+    fetch("http://localhost:3000/" + id, {
+      method: "DELETE",
+    })
+      .then((res) => {
+        if (!res.ok)
+          throw new Error("Errore nella cancellazione dell'articolo");
+        return res.json();
+      })
+      .then((data) => {
+        console.log(`L'oggetto con ID ${id} è stato eliminato con successo`);
+        return data;
+      })
+      .catch((error) =>
+        console.error("Errore nella richiesta DELETE :", error)
+      );
+  };
 
   return (
-    <PostsContext.Provider value={{ posts }}>{children}</PostsContext.Provider>
+    <PostsContext.Provider value={{ posts, deleteData }}>
+      {children}
+    </PostsContext.Provider>
   );
 };
 
