@@ -1,0 +1,24 @@
+.delete_button {
+  background-color: #b11e1e;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  right: 0;
+}
+
+.delete_button:hover {
+  background-color: #ff1a1a;
+}
+
+.show_button {
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
