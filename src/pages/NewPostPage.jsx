@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usePosts } from "../contexts/PostsContext";
 
 const initialPostData = {
   title: "",
@@ -12,63 +13,12 @@ const initialPostData = {
 export default function NewPostPage() {
   const [articleFormData, setArticleFormData] = useState(initialPostData);
   const [isBeingModified, toggleIsBeingModified] = useState(false);
-  const [postIdList, setPostIdList] = useState([]);
   const [selectedPost, setSelectedPost] = useState(initialPostData);
 
-  // STORE
-  const storeData = (item) => {
-    fetch("http://localhost:3000/", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-      body: JSON.stringify(item),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Errore nell'aggiunta dell'articolo");
-        return res.json();
-      })
-      .then((data) => {
-        console.log(`L'articolo è stato aggiunto con successo:`, data);
-      })
-      .catch((error) => console.error("Errore nella richiesta POST :", error));
-  };
-
-  //funzione per ottenere gli id presenti
-  async function getPostDetails(id) {
-    try {
-      const res = await fetch(`http://localhost:3000/${id}`);
-      if (!res.ok) {
-        if (res.status === 404) goToPage("/not-found");
-        throw new Error("Qualcosa è andato storto");
-      }
-      const data = await res.json();
-      return data;
-    } catch (error) {
-      console.error("Errore nella richiesta SHOW:", error);
-    }
-  }
-
-  const getPostsId = () => {
-    fetch("http://localhost:3000/posts-id")
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setPostIdList(data);
-      })
-      .catch((error) => console.error("Errore nella richiesta SHOW :", error));
-  };
-
-  function updateData(id, updatedData) {
-    fetch(`http://localhost:3000/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(updatedData),
-    });
-  }
+  const { posts, storeData, updateData } = usePosts();
 
   //HANDLERS
-  function handleArticleFormData(e) {
+  const handleArticleFormData = (e) => {
     const value =
       e.target.type === "checkbox" ? e.target.checked : e.target.value;
 
@@ -76,9 +26,9 @@ export default function NewPostPage() {
       ...formData,
       [e.target.name]: value,
     }));
-  }
+  };
 
-  function handleFormSubmit(e) {
+  const handleFormSubmit = (e) => {
     const { title, content, image, published, category } = articleFormData;
     //l'id è assegnato da una funzione nel server
     if (!title || !content) {
@@ -102,26 +52,22 @@ export default function NewPostPage() {
     }
 
     setArticleFormData(initialPostData);
-  }
+  };
 
   const handleModificationCheckbox = () => {
     if (isBeingModified) {
       toggleIsBeingModified(false);
     } else {
-      getPostsId();
       toggleIsBeingModified(true);
+      setArticleFormData(selectedPost);
     }
   };
 
-  async function handleSelectedPostChange(id) {
-    try {
-      const postData = await getPostDetails(id);
-      setSelectedPost(postData);
-      setArticleFormData(postData);
-    } catch (error) {
-      console.error("Errore durante la modifica del post selezionato:", error);
-    }
-  }
+  const handleSelectedPostChange = (id) => {
+    const currentPost = posts.find((post) => post.id === parseInt(id, 10));
+    setSelectedPost(currentPost);
+    setArticleFormData(currentPost);
+  };
 
   //DOM
   return (
@@ -206,6 +152,7 @@ export default function NewPostPage() {
           Submit
         </button>
       </form>
+      {/* modifica un post esistente */}
       <div className="col-6 mx-3">
         <div className="mb-3 form-check">
           <input
@@ -233,9 +180,9 @@ export default function NewPostPage() {
               handleSelectedPostChange(e.target.value);
             }}
           >
-            {postIdList.map((id) => (
-              <option value={id} key={id}>
-                {id}
+            {posts.map((post) => (
+              <option value={post.id} key={post.id}>
+                {post.id}
               </option>
             ))}
           </select>

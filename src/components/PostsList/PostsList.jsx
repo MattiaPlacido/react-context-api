@@ -1,13 +1,10 @@
+import { useState, useEffect } from "react";
 import styles from "./postList.module.css";
 import { Link } from "react-router-dom";
 import { usePosts } from "../../contexts/PostsContext";
 
 export default function PostsList() {
   const { posts, deleteData } = usePosts();
-
-  const handleDeleteButton = (id) => {
-    deleteData(id);
-  };
 
   return (
     <main className="container py-5">
@@ -22,7 +19,10 @@ export default function PostsList() {
             <button
               type="button"
               className={"btn position-absolute " + styles.delete_button}
-              onClick={() => handleDeleteButton(post.id)}
+              onClick={() => {
+                deleteData(post.id);
+                window.location.reload();
+              }}
             >
               &times;
             </button>
